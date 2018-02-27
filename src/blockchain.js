@@ -1,45 +1,41 @@
-//import * as R from "ramda";
+// import * as R from "ramda";
 
 import * as block from "./block";
 
-function initializeBlockchain() {
-  return [createGenesisBlock()];
-}
+const initializeBlockchain = () => [createGenesisBlock()];
 
-function createGenesisBlock() {
-  return block.initializeBlock(0, {message: "genesisBlock"}, "0");
-}
+const createGenesisBlock = () => block.initializeBlock(
+  0, 
+  {
+    amount: 50,
+    message: "genesisBlock"
+  }, 
+  "0"
+);
 
-function getLatestBlock(chain) {
-  return chain[chain.length - 1];
-}
+const getLatestBlock = chain => chain[chain.length - 1];
+
+const getPreviousHash = chain => getLatestBlock(chain).hash;
 
 // returns new array with new added block
-function addBlock(_data, _chain) {
-  //let chain = _chain;
-  let _index = _chain.length;
-  let _timestamp = Date.now();
-  let latest = getLatestBlock(_chain);
-  let _previousHash = getLatestBlock(_chain).hash;
+const addBlock = (_data, _chain) => {
+  let index = _chain.length;
+  let previousHash = getPreviousHash(_chain);
+  let newBlock = block.initializeBlock(index, _data, previousHash)
 
-  let newBlock =  {
-    index: _index,
-    timestamp: _timestamp,
-    data: _data,
-    previousHash: _previousHash,
-    hash: block.calculateHash(
-      _index,
-      _timestamp,
-      _data,
-      _previousHash
-    )
-  };
+  // add the block to the new chain array and return it
+  return [..._chain, newBlock];
+};
 
-  _chain.push(newBlock);
-}
+const isChainValid = _chain => {
+  let latestBlockPreviousHash = getLatestBlock(_chain).previousHash;
+  let previousBlockHash = _chain[getLatestBlock(_chain).index - 1].hash;
 
+  return latestBlockPreviousHash === previousBlockHash ? true : false;
+};
 
 export {
   initializeBlockchain,
-  addBlock
+  addBlock,
+  isChainValid
 }

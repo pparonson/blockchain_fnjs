@@ -1,4 +1,4 @@
-//import * as R from "ramda";
+// import * as R from "ramda";
 import sha256 from 'crypto-js/sha256'; 
 
 /*
@@ -8,31 +8,23 @@ import sha256 from 'crypto-js/sha256';
 * previousHash: hash of the previous block
 * hash: hash of this block
 */
-function initializeBlock(_index = 0, _data, _previousHash = "") {
+const initializeBlock = (index = 0,  _data, previousHash = "") => {
+  let timestamp = Date.now();
+  let data = _data;
+  //let previousHash = _previousHash;
+
   return {
-    index: _index,
-    timestamp: Date.now(),
-    data: _data,
-    previousHash: _previousHash,
-    hash: calculateHash(
-      this.index, 
-      this.timestamp, 
-      this.data, 
-      this.previousHash
-    )
+    index, 
+    timestamp, 
+    data, 
+    previousHash,
+    hash: calculateHash(index, timestamp, data, previousHash)
   };
 }
 
-function calculateHash(index, timestamp, data, previousHash) {
-  return sha256(
-    index + 
-    timestamp + 
-    JSON.stringify(data) + 
-    previousHash
-  ).toString();
-}
-
-
+// impure: sha256 causes side effects
+const calculateHash = (index, timestamp, data, previousHash) => 
+  sha256(index + timestamp + JSON.stringify(data) + previousHash).toString();
 
 export {
   initializeBlock,
